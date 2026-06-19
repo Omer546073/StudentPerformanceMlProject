@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Score Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --board: #1F3A2E;
+    --board-dark: #15291F;
+    --chalk: #EFEAD8;
+    --chalk-dim: #B9C4B6;
+    --brass: #C99A3D;
+    --brass-bright: #E0B85C;
+    --red-pen: #C1503E;
+    --line: rgba(239,234,216,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top, rgba(255,255,255,0.04), transparent 60%),
+      var(--board);
+    color:var(--chalk);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    padding:48px 20px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+
+  header{text-align:center;margin-bottom:40px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--brass-bright);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:42px;
+    margin:0 0 10px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    color:var(--chalk-dim);
+    font-size:15px;
+    max-width:480px;
+    margin:0 auto;
+    line-height:1.5;
+  }
+
+  form{
+    background:var(--board-dark);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:8px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  }
+
+  fieldset{
+    border:none;
+    border-top:1px dashed var(--line);
+    padding:26px 28px 8px;
+    margin:0;
+  }
+  fieldset:first-of-type{border-top:none;}
+
+  legend{
+    font-family:'Fraunces', serif;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--brass);
+    padding:0 4px;
+    margin-left:-4px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px 20px;
+    padding-bottom:18px;
+  }
+  @media (max-width:520px){
+    .grid{grid-template-columns:1fr;}
+  }
+
+  .field label{
+    display:block;
+    font-size:13px;
+    color:var(--chalk-dim);
+    margin-bottom:6px;
+  }
+  .field .hint{
+    font-size:11px;
+    color:rgba(185,196,182,0.6);
+    margin-top:4px;
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  input[type="number"]{
+    width:100%;
+    background:rgba(239,234,216,0.05);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:11px 12px;
+    color:var(--chalk);
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    transition:border-color 0.15s, background 0.15s;
+  }
+  input[type="number"]::-webkit-inner-spin-button{opacity:0.5;}
+  input[type="number"]:focus{
+    outline:none;
+    border-color:var(--brass);
+    background:rgba(239,234,216,0.08);
+  }
+  input[type="number"]:focus-visible{
+    outline:2px solid var(--brass-bright);
+    outline-offset:2px;
+  }
+
+  .submit-row{
+    padding:24px 28px 28px;
+  }
+  button{
+    width:100%;
+    background:var(--brass);
+    color:var(--board-dark);
+    border:none;
+    border-radius:9px;
+    padding:15px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.01em;
+    cursor:pointer;
+    transition:background 0.15s, transform 0.1s;
+  }
+  button:hover{background:var(--brass-bright);}
+  button:active{transform:scale(0.99);}
+  button:focus-visible{outline:2px solid var(--brass-bright);outline-offset:3px;}
+
+  /* Result stamp */
+  .result{
+    margin-top:36px;
+    display:flex;
+    align-items:center;
+    gap:22px;
+    background:var(--board-dark);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:24px 28px;
+  }
+  .stamp{
+    flex:0 0 auto;
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    border:3px solid var(--red-pen);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform:rotate(-8deg);
+    position:relative;
+  }
+  .stamp::before{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:1px solid var(--red-pen);
+    border-radius:50%;
+    opacity:0.5;
+  }
+  .stamp span{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:20px;
+    color:var(--red-pen);
+  }
+  .result-text .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--brass-bright);
+    margin-bottom:4px;
+  }
+  .result-text .value{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    color:var(--chalk);
+  }
+  .result-text .value.error{
+    color:var(--red-pen);
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:28px;
+    font-size:12px;
+    color:rgba(185,196,182,0.45);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Linear Regression · Student Performance</div>
+    <h1>Exam Score Predictor</h1>
+    <p>Fill in a student's record below to estimate their exam score from the trained model.</p>
+  </header>
+
+  <form action="/predict" method="POST">
+
+    <fieldset>
+      <legend>Study Habits</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="Hours_Studied">Hours Studied (weekly)</label>
+          <input type="number" step="any" id="Hours_Studied" name="Hours_Studied" required>
+        </div>
+        <div class="field">
+          <label for="Attendance">Attendance (%)</label>
+          <input type="number" step="any" id="Attendance" name="Attendance" required>
+        </div>
+        <div class="field">
+          <label for="Sleep_Hours">Sleep Hours (nightly)</label>
+          <input type="number" step="any" id="Sleep_Hours" name="Sleep_Hours" required>
+        </div>
+        <div class="field">
+          <label for="Previous_Scores">Previous Scores</label>
+          <input type="number" step="any" id="Previous_Scores" name="Previous_Scores" required>
+        </div>
+        <div class="field">
+          <label for="Tutoring_Sessions">Tutoring Sessions</label>
+          <input type="number" step="any" id="Tutoring_Sessions" name="Tutoring_Sessions" required>
+        </div>
+        <div class="field">
+          <label for="Physical_Activity">Physical Activity (hrs/wk)</label>
+          <input type="number" step="any" id="Physical_Activity" name="Physical_Activity" required>
+        </div>
+        <div class="field">
+          <label for="Study_Efficiency">Study Efficiency</label>
+          <input type="number" step="any" id="Study_Efficiency" name="Study_Efficiency" required>
+          <div class="hint">score / hours studied</div>
+        </div>
+        <div class="field">
+          <label for="Total_Support">Total Support</label>
+          <input type="number" step="any" id="Total_Support" name="Total_Support" required>
+        </div>
+        <div class="field">
+          <label for="Study_Sleep_Total">Study + Sleep Total</label>
+          <input type="number" step="any" id="Study_Sleep_Total" name="Study_Sleep_Total" required>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Background &amp; Support</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="Parental_Involvement_Score">Parental Involvement</label>
+          <input type="number" step="any" id="Parental_Involvement_Score" name="Parental_Involvement_Score" required>
+        </div>
+        <div class="field">
+          <label for="Extracurricular_Activities_Encoded">Extracurricular Activities</label>
+          <input type="number" step="any" id="Extracurricular_Activities_Encoded" name="Extracurricular_Activities_Encoded" required>
+          <div class="hint">encoded, e.g. 0/1</div>
+        </div>
+        <div class="field">
+          <label for="Internet_Access_Encoded">Internet Access</label>
+          <input type="number" step="any" id="Internet_Access_Encoded" name="Internet_Access_Encoded" required>
+          <div class="hint">encoded, e.g. 0/1</div>
+        </div>
+        <div class="field">
+          <label for="Learning_Disabilities_Encoded">Learning Disabilities</label>
+          <input type="number" step="any" id="Learning_Disabilities_Encoded" name="Learning_Disabilities_Encoded" required>
+          <div class="hint">encoded, e.g. 0/1</div>
+        </div>
+        <div class="field">
+          <label for="Access_to_Resources_Encoded">Access to Resources</label>
+          <input type="number" step="any" id="Access_to_Resources_Encoded" name="Access_to_Resources_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Motivation_Level_Encoded">Motivation Level</label>
+          <input type="number" step="any" id="Motivation_Level_Encoded" name="Motivation_Level_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Family_Income_Encoded">Family Income</label>
+          <input type="number" step="any" id="Family_Income_Encoded" name="Family_Income_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Teacher_Quality_Encoded">Teacher Quality</label>
+          <input type="number" step="any" id="Teacher_Quality_Encoded" name="Teacher_Quality_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>School &amp; Demographics</legend>
+      <div class="grid">
+        <div class="field">
+          <label for="Attendance_Group_Encoded">Attendance Group</label>
+          <input type="number" step="any" id="Attendance_Group_Encoded" name="Attendance_Group_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Peer_Influence_Encoded">Peer Influence</label>
+          <input type="number" step="any" id="Peer_Influence_Encoded" name="Peer_Influence_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Parental_Education_Level_Encoded">Parental Education Level</label>
+          <input type="number" step="any" id="Parental_Education_Level_Encoded" name="Parental_Education_Level_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Distance_from_Home_Encoded">Distance from Home</label>
+          <input type="number" step="any" id="Distance_from_Home_Encoded" name="Distance_from_Home_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Score_Category_Encoded">Score Category</label>
+          <input type="number" step="any" id="Score_Category_Encoded" name="Score_Category_Encoded" required>
+          <div class="hint">encoded, typically 0–3</div>
+        </div>
+        <div class="field">
+          <label for="Gender_Encoded">Gender</label>
+          <input type="number" step="any" id="Gender_Encoded" name="Gender_Encoded" required>
+          <div class="hint">encoded, e.g. 0/1</div>
+        </div>
+        <div class="field">
+          <label for="School_Type_Encoded">School Type</label>
+          <input type="number" step="any" id="School_Type_Encoded" name="School_Type_Encoded" required>
+          <div class="hint">encoded, e.g. 0/1</div>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="submit-row">
+      <button type="submit">Calculate Predicted Score</button>
+    </div>
+  </form>
+
+  {% if prediction_text %}
+  <div class="result">
+    <div class="stamp"><span>{{ prediction_text.split(':')[-1].strip() if ':' in prediction_text else '—' }}</span></div>
+    <div class="result-text">
+      <div class="label">Result</div>
+      <div class="value {{ 'error' if 'Error' in prediction_text else '' }}">{{ prediction_text }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <footer>Predictions are estimates based on a linear regression model and historical data.</footer>
+</div>
+</body>
+</html>
